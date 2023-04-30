@@ -1,5 +1,5 @@
 //@version=5
-
+// // The script uses the MAHQ and the MALQ index and subtracts the second from the first. So you can see how many stocks in the Nasdaq make new highs or new lows on a 52 weeks basis and see the trend of the market.
 indicator(title = "52 Weeks Highs-Lows Nasdaq", shorttitle="52 Weeks Highs-Lows Nasdaq")
 
 newhigh = request.security ("MAHQ", "", close)
