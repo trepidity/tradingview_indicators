@@ -1,0 +1,84 @@
+//@version=5
+indicator('Trepidity\'s Opening Range (w/Extensions)', shorttitle='OR', overlay=true)
+
+input_or = input.session('0930-1000', title='Opening Range Time (EST)', tooltip='The duration of the opening range to be drawn.')
+
+// Inputs
+input_rth = input.session('0930-1600', title='Regular Session Time (EST)', tooltip='If you want to get full session (including overnight) high/low values, then change the regular session interval.  For example, on a 5-mninute chart, 1800-1655 will provide the high and low for the full daily session.')
+or_session = time(timeframe.period, str.format('{0}:1234567', input_or), 'America/New_York')
+rth_session = time('1440', str.format('{0}:23456', input_rth), 'America/New_York')
+
+// Opening Range
+var or_high = 0.0
+var or_low = 0.0
+
+
+if or_session
+    if not or_session[1]
+        or_low := low
+        or_high := high
+        or_high
+    else
+        or_low := math.min(low, or_low)
+        or_high := math.max(high, or_high)
+        or_high
+
+
+or_mid = or_low + (or_high - or_low) / 2
+or_ext1A = or_high - or_mid
+or_ext1 = or_high + or_ext1A
+or_ext2 = or_high + or_ext1A * 2
+or_ext3 = or_high + or_ext1A * 3
+or_ext4 = or_high + or_ext1A * 4
+
+or_ext1B = or_low - or_ext1A
+or_ext2B = or_low - or_ext1A * 2
+or_ext3B = or_low - or_ext1A * 3
+or_ext4B = or_low - or_ext1A * 4
+
+
+// RTH High/Low
+
+var float rth_high = na
+var float rth_low = na
+var float prior_rth_high = na
+var float prior_rth_low = na
+
+if rth_session
+    if not rth_session[1]
+        rth_low := low
+        rth_high := high
+        rth_high
+    else
+        rth_low := math.min(low, rth_low)
+        rth_high := math.max(high, rth_high)
+        rth_high
+else
+    prior_rth_low := rth_low
+    prior_rth_high := rth_high
+    prior_rth_high
+
+
+// Plots
+
+or_high_plot = plot(not or_session ? or_high : na, title='ORH', color=color.new(#268FFF, 0), linewidth=2, style=plot.style_linebr)
+or_low_plot = plot(not or_session ? or_low : na, title='ORL', color=color.new(#FF217E, 0), linewidth=2, style=plot.style_linebr)
+or_1A = plot(not or_session ? or_ext1 : na, title='1A', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+or_2A = plot(not or_session ? or_ext2 : na, title='2A', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+or_3A = plot(not or_session ? or_ext3 : na, title='3A', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+or_4A = plot(not or_session ? or_ext4 : na, title='4A', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+
+or_1B = plot(not or_session ? or_ext1B : na, title='1B', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+or_2B = plot(not or_session ? or_ext2B : na, title='2B', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+or_3B = plot(not or_session ? or_ext3B : na, title='3B', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+or_4B = plot(not or_session ? or_ext4B : na, title='4B', color=color.new(#B2B5BE, 0), linewidth=1, style=plot.style_linebr)
+
+
+plot(not or_session ? or_mid : na, title='ORM', color=color.new(#FFFFFF, 0), linewidth=1, style=plot.style_linebr)
+
+fill(or_high_plot, or_low_plot, title='OR Fill', color=color.new(color.white, 97))
+
+
+plot(not rth_session ? rth_high : prior_rth_high, title='RTH', color=color.new(#1BE091, 0), linewidth=1, style=plot.style_line)
+plot(not rth_session ? rth_low : prior_rth_low, title='RTL', color=color.new(#E02B16, 0), linewidth=1, style=plot.style_line)
+

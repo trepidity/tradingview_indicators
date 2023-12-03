@@ -1,0 +1,21 @@
+//@version=4
+// created by adolfhitler.eth AKA NFTMachine
+
+// ver1: shows weekend entry and exit
+// ver2: allows for it to run through monday if you want it to (set to false on default)
+// ver3: allows for it to run an extra x hours.  Set to 14 by default so that line stops when US stock trading day begins
+// ver4: simplied system so that you can choose exact start hour and exact end hour
+// ver5: changed color coating on higher timeframes than 1 hour because those will appear less accurately
+
+// NOTE: FOR MOST ACCURACY, BEST VIEWED ON 1 HOUR OR BELOW.  DOES NOT WORK WELL ON HIGHER TIMEFRAMES!
+
+study("The Weekend Line: line from end of Friday to end of Sunday v5", overlay=true)
+
+extra = input(14, "Hour to close the line at.  Set to 14 for 9AM US Eastern Monday (open of US stock market)")
+starthour = input(20, "Hour to draw line from.  Set to 19 for 4PM US Eastern (close of US stock market) ... NOTE ABOUT THIS INDICATOR: FOR MOST ACCURACY, BEST VIEWED ON 1 HOUR OR BELOW.  DOES NOT WORK WELL ON HIGHER TIMEFRAMES!")
+
+count = close
+count := dayofweek == dayofweek.friday and hour <= starthour ? close : nz(count[1])  // set the level
+
+// show the level
+plot(hour > starthour and dayofweek == dayofweek.friday or dayofweek == dayofweek.saturday or dayofweek == dayofweek.sunday or dayofweek == dayofweek.monday and hour < extra ? count : na, style=plot.style_cross, linewidth=2, color=timeframe.period == "60" or timeframe.period == "45" or timeframe.period == "30" or timeframe.period == "20" or timeframe.period == "15" or timeframe.period == "10" or timeframe.period == "5" or timeframe.period == "1" ? color.fuchsia : color.white)
